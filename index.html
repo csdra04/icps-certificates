@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Certificate – Centre for System Design, NITK Surathkal</title>
+<style>
+  :root { --blue:#1a0aa8; --gold:#f2b84b; --ink:#1b1b1f; --muted:#5d5d6b; --bg:#f6f5ef; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--ink); }
+  header { background:var(--blue); color:#fff; padding:14px 20px; font-weight:600; letter-spacing:.2px; }
+  header small { display:block; font-weight:400; opacity:.8; font-size:13px; }
+  main { max-width:880px; margin:0 auto; padding:20px 16px 40px; }
+  .card { background:#fff; border-radius:14px; box-shadow:0 2px 14px rgba(0,0,0,.07); overflow:hidden; }
+  .status { display:flex; align-items:center; gap:10px; padding:16px 20px; border-bottom:1px solid #eee; font-weight:600; }
+  .dot { width:12px; height:12px; border-radius:50%; background:#1f9d55; flex:none; }
+  .bad .dot { background:#c53030; }
+  dl { display:grid; grid-template-columns:max-content 1fr; gap:8px 18px; padding:16px 20px; margin:0; }
+  dt { color:var(--muted); } dd { margin:0; font-weight:500; }
+  img.cert { display:block; width:100%; border-top:1px solid #eee; }
+  .actions { display:flex; gap:10px; flex-wrap:wrap; padding:16px 20px; }
+  a.btn { flex:1 1 180px; text-align:center; padding:13px 16px; border-radius:10px; text-decoration:none; font-weight:600; }
+  a.primary { background:var(--blue); color:#fff; }
+  a.secondary { border:2px solid var(--blue); color:var(--blue); }
+  .msg { padding:30px 20px; text-align:center; color:var(--muted); }
+  footer { text-align:center; color:var(--muted); font-size:13px; margin-top:22px; }
+</style>
+</head>
+<body>
+<header>Centre for System Design<small>NITK Surathkal · Certificate verification</small></header>
+<main>
+  <div class="card" id="card"><div class="msg">Loading certificate…</div></div>
+  <footer>Scan the QR code on a certificate to view and download it.</footer>
+</main>
+<script>
+(async () => {
+  const card = document.getElementById('card');
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const id = (new URLSearchParams(location.search).get('id') || '').trim();
+  const fail = text => { card.innerHTML =
+    `<div class="status bad"><span class="dot"></span>Certificate not found</div><div class="msg">${text}</div>`; };
+  if (!/^[A-Z0-9-]{4,40}$/.test(id)) return fail('No valid certificate ID in this link. Please scan the QR code again.');
+  try {
+    const r = await fetch(`certs/${id}.json`, { cache: 'no-store' });
+    if (!r.ok) throw 0;
+    const c = await r.json();
+    document.title = `${c.name} – Certificate`;
+    card.innerHTML = `
+      <div class="status"><span class="dot"></span>Verified certificate</div>
+      <dl>
+        <dt>Name</dt><dd>${esc(c.name)}</dd>
+        <dt>Course</dt><dd>${esc(c.course)}</dd>
+        <dt>Completed</dt><dd>${esc(c.date)}</dd>
+        <dt>Certificate ID</dt><dd>${esc(id)}</dd>
+      </dl>
+      <div class="actions">
+        <a class="btn primary" href="certs/${id}.pdf" download="${esc(c.name)} - iCPS Certificate.pdf">Download PDF</a>
+        <a class="btn secondary" href="certs/${id}.png" download="${esc(c.name)} - iCPS Certificate.png">Download image</a>
+      </div>
+      <img class="cert" src="certs/${id}.png" alt="Certificate of ${esc(c.name)}">`;
+  } catch { fail(`We couldn't find certificate <b>${esc(id)}</b>. It may have been revoked or the link is incorrect.`); }
+})();
+</script>
+</body>
+</html>
