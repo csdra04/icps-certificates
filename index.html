@@ -8,7 +8,7 @@
 <link rel="icon" type="image/png" href="assets/nitk-logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Petit+Formal+Script&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Petit+Formal+Script&family=Dancing+Script&display=swap" rel="stylesheet">
 <style>
   :root {
     --blue:#1a0aa8; --blue-dark:#120778; --gold:#e9a93a; --gold-soft:#fbf1dc;
@@ -82,6 +82,8 @@
     font-family:"Petit Formal Script",cursive; font-weight:400; font-size:clamp(26px,3.4vw,34px);
     line-height:1.15; margin:14px 0 4px; color:var(--ink); word-break:break-word;
   }
+  .name .cap { font-size:1.4em; }   /* this font's capitals are barely taller than lowercase */
+  .name .alt { font-family:"Dancing Script",cursive; font-size:1.25em; }  /* its M and N look lowercase; borrow these two */
   .rule { height:2px; width:72px; background:var(--gold); border-radius:2px; margin:6px 0 18px; }
 
   dl { margin:0 0 22px; display:grid; gap:14px; }
@@ -243,7 +245,7 @@
         </div>
         <div class="details">
           <span class="badge">${icon.ok}Verified certificate</span>
-          <div class="name">${name}</div>
+          <div class="name">${name.replace(/[A-Z]/g, ch => `<span class="${'MN'.includes(ch) ? 'alt' : 'cap'}">${ch}</span>`)}</div>
           <div class="rule"></div>
           <dl>
             <div><dt>Course</dt><dd>${esc(c.course)}</dd></div>
